@@ -1,6 +1,6 @@
 import mimetypes
 import os
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 from google import genai
 from google.genai import types
 from google.adk.tools import tool_context  # only needed for type hinting
@@ -147,6 +147,9 @@ async def generate_image(
     tool_context: tool_context.ToolContext,
     filename_prefix: str = "generated_image",
 ) -> Dict[str, Optional[str]]:
+    """
+        This function generates images based on prompt
+    """
     response = client.models.generate_content(
         model="gemini-2.5-flash-image-preview",
         contents=[prompt],
@@ -179,3 +182,82 @@ async def generate_image(
         "generated_images": saved_artifacts,
         "text_response": text_response,
     }
+
+
+def _get_custom_field(fields: List[Dict[str, Any]], name: str) -> Optional[Dict[str, Any]]:
+    """Return the custom field dict by its 'name' or None."""
+    for f in fields:
+        if f.get("name") == name:
+            return f
+    return None
+
+def _extract_platform_labels(platform_field: dict) -> list[str]:
+    default_platforms = ["article (web)"]
+    if not platform_field:
+        return default_platforms
+
+    selected_ids = platform_field.get("value") or []
+    options = platform_field.get("type_config", {}).get("options", [])
+    if not selected_ids or not options:
+        return default_platforms
+
+    id_to_label = {opt["id"]: opt["label"] for opt in options if "id" in opt and "label" in opt}
+    labels = [id_to_label[opt_id] for opt_id in selected_ids if opt_id in id_to_label]
+    return labels or default_platforms
+
+
+def extract_content_request(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Given a ClickUp-like task payload, extract the fields needed by the content planner:
+
+      {
+        "content_theme": "<string>",
+        "content_goal": "<string>",
+        "target_audience": "<string>",
+        "user_name": "<string>",
+        "user_email": "<string>",
+        "content_notes": "<string>",
+        "platforms": ["..."]  # default ["article (web)"] if none selected
+      }
+    """
+    # Core fields
+    content_theme = payload.get("name", "")  # Task title as theme
+
+    # Custom fields (by name)
+    custom_fields: List[Dict[str, Any]] = payload.get("custom_fields", [])
+    goal_field = _get_custom_field(custom_fields, "Content Goal")
+    audience_field = _get_custom_field(custom_fields, "Target Audience")
+    notes_field = _get_custom_field(custom_fields, "Content Notes")
+    platforms_field = _get_custom_field(custom_fields, "Platforms")
+
+    content_goal = (goal_field.get("value") if goal_field else "") or ""
+    target_audience = (audience_field.get("value") if audience_field else "") or ""
+    content_notes = (notes_field.get("value") if notes_field else "") or ""
+
+    platforms = _extract_platform_labels(platforms_field)
+
+    # User identity (prefer creator, fallback to first assignee)
+    user_email = payload.get("creator_email") or ""
+    user_name = payload.get("creator_username") or ""
+
+    if not user_email or not user_name:
+        assignees = payload.get("assignees") or []
+        if assignees:
+            a0 = assignees[0]
+            user_email = user_email or a0.get("email", "")
+            user_name = user_name or a0.get("username") or a0.get("initials") or ""
+
+    return {
+        "content_theme": content_theme,
+        "content_goal": content_goal,
+        "target_audience": target_audience,
+        "user_name": user_name,
+        "user_email": user_email,
+        "content_notes": content_notes,
+        "platforms": platforms,
+    }
+
+
+# --- Example usage ---
+# result = extract_content_request(your_payload_dict)
+# print(result)
