@@ -1,7 +1,6 @@
 import mimetypes
 import os
 from typing import Dict, List, Optional
-
 from google import genai
 from google.genai import types
 from google.adk.tools import tool_context  # only needed for type hinting

@@ -1,31 +1,40 @@
+import datetime
 from google.adk.agents import Agent
-from ..config import (text_model)
-from ..tools.tools import (
-    create_file,
-    read_file,
-    get_user_file_path
-)
+from google.adk.tools import google_search
+from ..config import text_model, text_model_lite
+from ..tools.tools import create_file, read_file, get_user_file_path
 from google.genai import types
+
+now = datetime.datetime.now()
 
 guideline_agent = Agent(
     name="content_guideline_agent",
-    model=text_model,
+    model=text_model_lite,
     generate_content_config=types.GenerateContentConfig(
-        temperature=0.5, # More deterministic output
+        temperature=0.3,  # mais determinístico
     ),
-    description="You are the agent responsible for managing the content guidelines.",
+    description="Agent responsible for managing the content guidelines automatically.",
     instruction=f"""
-        Get the user info from get_user_file_path to know were to search and save files (user_guideline_path).
-        Identify witch user guidelines you are searching for.
-        To save the guidelines use the result from tool get_user_file_path - user_guideline_path.
-        Verify if there are existing guidelines using the read_file tool passing the user_guideline_path as the path.
-        If there are no guideline inside the file or the file do not exist use default to start creating a new guideline with the user and use the tool create_file to save the new guideline. User name on file path need to be formated properly.
-        If there are guidelines inside the file, present the user with the options and let they choose. If the user creates another guideline or update an existing one, append the new guideline inside the file using the create_file tool.
-        If the user do not update an existing guideline do not use the create guideline tool (no update needed)
+        Get the user info from get_user_file_path to locate and save files (user_guideline_path).
+        Identify which user guideline you are searching for.
         
-        The create_file tool accept only the content (guideline) as parameter and it should be in the format of the default guideline. and update the guidelive version, name and numer when creating a new one (don't forget to wrap in ```yaml to make reading better inside the file and add a comment before each guideline)
+        Behavior rules:
+        - Never interact with or ask the user anything.
+        - Never present choices or options.
+        - Operate fully automatically, following the General Rules.
 
-        Default guideline:
+        Logic:
+        1. Use the read_file tool to check if a guideline file exists at user_guideline_path.
+        2. If it exists and contains a valid guideline, load and use it.
+        3. If the file does not exist or is empty, generate a new one based on the default guideline template.
+        4. When creating a new guideline, always:
+           - Use the create_file tool to write it.
+           - Update the guideline version and name accordingly.
+           - Wrap the guideline content inside ```yaml and include a comment marker before it.
+        5. After loading or creating the guideline, output it directly and proceed to the next step.
+        6. Do not iterate or wait for confirmation.
+
+        Default guideline format:
         <!-- GUIDELINE_START:user_content_guideline_v0 -->
         ```yaml
         guideline_name: user_content_guideline_default_en_v0
@@ -59,11 +68,48 @@ guideline_agent = Agent(
             allow_emojis: false
             other_notes: "Use '...' for soft pauses. Keep titles concise."
         general_notes: "Platform-agnostic. Content should be useful and actionable. Use some star trek fun references to make text more dynamic and fun to read."
-    ```
-    Iterate the guidelines with the user before saving. 
-    Always use the format of the template above to save future guidelines.
-    Once guideline is created or saved, proceed to content creation.
+        ```
     """,
     output_key="guideline",
-    tools=[read_file, create_file, get_user_file_path]
+    tools=[read_file, create_file, get_user_file_path],
+)
+
+
+theme_research_definition = Agent(
+    name="theme_research_definition_agent",
+    model=text_model,
+    description="You are responsible for defining the content theme, the best research topic and related topics to create the best content.",
+    instruction=f"""
+        You are responsible for establishing the content theme research definition.
+        Get the theme and get the most updated information related to generate a couple of research topics to generate the deep content for the nest agent. Get the most updated info as of {now}.
+        According with the theme and topis, do the best research and content gathering. If practical, serach for more practical examples, if insightful, get more insight, more actionable, get more actions and so on. Describe your chain of thought.
+    """,
+    tools=[google_search],
+    output_key="theme_topics",
+)
+
+
+content_research_agent = Agent(
+    name="content_research_specialst",
+    model=text_model_lite,
+    description="Expert in online research. You always find the best and more credible resourses.",
+    instruction=f"""
+        Getting the most updated information as of today {now}. Search online the topics theme_topics created by the theme_research_definition_agent and get deep valuable and insightful content. According with the theme, do the best research and content gathering. If practical, serach for more practical examples, if insightful, get more insight, more actionable, get more actions and so on. Describe your chain of thought.
+    """,
+    tools=[google_search],
+    output_key="content_research",
+)
+
+
+content_structure_agent = Agent(
+    name="content_structure_creator",
+    model=text_model_lite,
+    description="You are responsible for creating the content structure to extract the most value from it.",
+    instruction=f"""
+        You are responsible for establishing the content structure to be created.
+        Make sure the content will follow best practices on how to present texts to the audience. In a sequential clear structured way. To better convey the information and the message.
+        It should have an engaging structure to buildup the theme until climax and conclusion.
+        Use the content_research to build the structure points.
+    """,
+    output_key="content_structure",
 )

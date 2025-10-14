@@ -6,7 +6,6 @@ load_dotenv()
 os.environ.setdefault("GOOGLE_GENAI_USE_VERTEXAI", "FALSE")
 os.environ.setdefault("GOOGLE_CLOUD_PROJECT", "gen-lang-client-0626131813")
 os.environ.setdefault("GOOGLE_CLOUD_REGION", "us-central1")
-os.environ.setdefault("GOOGLE_API_KEY", os.getenv("GOOGLE_API_KEY"))
 google_api_key = os.getenv("GOOGLE_API_KEY")
 
 audio_model_native_audio = LiteLlm(
