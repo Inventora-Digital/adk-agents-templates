@@ -1,17 +1,12 @@
 import datetime
 from google.adk.agents import Agent
-from .config import text_model
-from .config import text_model_lite
-from .subagents.subagents import guideline_agent
-from .subagents.subagents import content_structure_agent
-from .subagents.subagents import theme_research_definition
-from .subagents.subagents import content_research_agent
-from .tools.tools import (
-    get_user_list,
-    create_user_list,
-    get_user_file_path,
-    create_file,
-    read_file,
+from .config import (
+  text_model,
+  text_model_lite
+)
+from .subagents.subagents import (
+  content_planner_agent,
+  response_formatter_agent
 )
 
 now = datetime.datetime.now()
@@ -41,12 +36,13 @@ root_agent = Agent(
         "content_goal": "<string>",
         "target_audience": "<string>"
         "user_name": "<string>",
-        "custom_fields": { ... }
+        "user_email": "<string>",
+        "platforms": "optional<list>" - Default as article (web)
+
+      Then, use the response_formatter_agent to format the output and use the final output as you final response. No aditional text needed.
     """,
     sub_agents=[
-        guideline_agent,
-        content_research_agent,
-        content_structure_agent,
-        theme_research_definition,
+        content_planner_agent,
+        response_formatter_agent
     ],
 )
