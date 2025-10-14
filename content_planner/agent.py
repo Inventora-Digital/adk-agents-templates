@@ -1,5 +1,7 @@
 import datetime
 from google.adk.agents import Agent
+from google.adk.tools.agent_tool import AgentTool
+from google.adk.tools import FunctionTool
 from .config import (
   text_model
 )
@@ -32,21 +34,11 @@ root_agent = Agent(
         for identical inputs.
       - Reject incomplete payloads. Do not guess missing required fields.
       - Log and return structured error objects for any failure (validation, tool failure, subagent error).
-      Given a full poluted payload, extract the information bellow using the tool extract_content_request.
-      Expected extracted input:
-        "content_theme": "<string>",
-        "content_goal": "<string>",
-        "target_audience": "<string>"
-        "user_name": "<string>",
-        "user_email": "<string>",
-        "content_notes": "<string>",
-        "platforms": "optional<list>" - Default as article (web)
-      send the payload to the content_planner_agent.
-      Then, use the response_formatter_agent to format the output from the content_planner_agent and use the final output as you final response. No aditional text needed.
+      Given a full entry payload, extract the information bellow 1 time using the tool extract_content_request. Send the response to the content_planner_agent tool .
+      Then, use the response_formatter_agent to format the output from the content_planner_agent and use the final output formated as Markdown text as you final response. No aditional text needed.
     """,
     sub_agents=[
-        content_planner_agent,
         response_formatter_agent
     ],
-    tools=[extract_content_request]
+    tools=[FunctionTool(extract_content_request), AgentTool(agent=content_planner_agent)]
 )

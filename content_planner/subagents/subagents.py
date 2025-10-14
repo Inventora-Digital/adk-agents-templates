@@ -51,37 +51,7 @@ now = datetime.datetime.now()
 #         <!-- GUIDELINE_START:user_content_guideline_v0 -->
 #         ```yaml
 #         guideline_name: user_content_guideline_default_en_v0
-#         version: "v0"
-#         language: "EN"
-#         writing_style:
-#             tone: "semi-casual, conversational, explanatory"
-#             voice: "first person, simple, direct"
-#             formality: "low-medium"
-#             pacing: "steady, clear, action-first"
-#             sentence_length: "short"
-#             transitions: "plain connectors; allow ellipses for soft pauses"
-#         do:
-#             - "use quotes when citing facts or other people's words"
-#             - "write everything in first person"
-#             - "keep paragraphs short and scannable"
-#             - "show a quick example when introducing a concept"
-#             - "add a one-line reflection at the end"
-#             - "be explicit about limits and when not to use an approach"
-#             - "prefer active voice"
-#         dont:
-#             - "no emojis"
-#             - "never use dash"
-#             - "avoid buzzwords and vague claims"
-#             - "do not over-explain obvious points"
-#         length:
-#             default: "800-1200 words"
-#             notes: "Short intro. Tight sections. Emails and micro-posts can be much shorter."
-#         punctuation_preferences:
-#             use_dash: false
-#             allow_emojis: false
-#             other_notes: "Use '...' for soft pauses. Keep titles concise."
-#         general_notes: "Platform-agnostic. Content should be useful and actionable."
-#         ```
+        #   {{guideline}}
 #     """,
 #     output_key="guideline",
 # )
@@ -138,8 +108,8 @@ content_planner_agent = Agent(
                     - Audience: who we are creating for.
                     - Key Message: the main idea we want to communicate.
                     - Content Pillars: 3–5 main topics we’ll focus on.
-                    - Formats: types of content (articles, videos, posts, etc.).
-                    - Channels: where it will be published.
+                    - Formats: types of content (article, post).
+                    - Channels: where it will be published (web, linkedin, twitter, reddit...).
                     - Guideline: {guideline}
 
             3. Deliverable
