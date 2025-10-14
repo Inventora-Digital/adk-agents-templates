@@ -124,8 +124,8 @@ content_planner_agent = Agent(
                         - "AI tools that boost productivity"
                         - "Real client stories"
                         - "Tips to automate daily operations"
-                    formats: ["Blog posts", "Short videos", "Email tips"]
-                    channels: ["LinkedIn", "YouTube", "Newsletter", "Blog"]
+                    formats: ["article", "newsletter", "post"]
+                    channels: ["web", "linkedin", "twitter", "reddit"]
                     guideline: {guideline}
         """,
     tools=[google_search],
