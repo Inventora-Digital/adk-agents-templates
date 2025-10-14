@@ -2,9 +2,6 @@ import datetime
 from google.adk.agents import Agent
 from google.adk.tools.agent_tool import AgentTool
 from google.adk.tools import FunctionTool
-from .config import (
-  text_model
-)
 from .subagents.subagents import (
   content_planner_agent,
   response_formatter_agent
@@ -12,7 +9,8 @@ from .subagents.subagents import (
 from .tools.tools import (
     extract_content_request
 )
-
+text_model_lite="gemini-2.5-flash-lite"
+text_model = "gemini-2.5-flash"
 now = datetime.datetime.now()
 
 
