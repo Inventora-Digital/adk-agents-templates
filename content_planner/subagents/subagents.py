@@ -3,7 +3,6 @@ from typing import List
 from google.adk.agents import Agent
 from google.adk.tools import google_search
 from ..config import (
-    text_model, 
     text_model_lite
 )
 from pydantic import BaseModel, Field
@@ -120,7 +119,7 @@ content_planner_agent = Agent(
     name="content_planner",
     model=text_model_lite,
     description="You are responsible for planning the content structure for your client.",
-    instruction="""
+    instruction=f"""
         Goal: >
             Build a clear, structured content plan based on a theme, goal, and audience.
         Using the default guideline, create a content plan based on the theme, goal, platforms and, audience for your client.
@@ -131,7 +130,7 @@ content_planner_agent = Agent(
                 - Use google_search to look up current content strategies and trends related to the theme and goal.
                 - Focus on what formats, channels, and tones work best for the target audience today.
 
-            2. Create the Plan
+            2. Create the Plan according with user inputs (DO NOT ASSUME)
                 - Organize your work into these sections:
                     - Theme: main subject of the plan.
                     - Goal: what we want to achieve (awareness, leads, etc.).

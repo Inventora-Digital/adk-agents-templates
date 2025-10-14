@@ -1,8 +1,7 @@
 import datetime
 from google.adk.agents import Agent
 from .config import (
-  text_model,
-  text_model_lite
+  text_model
 )
 from .subagents.subagents import (
   content_planner_agent,
@@ -30,13 +29,14 @@ root_agent = Agent(
         for identical inputs.
       - Reject incomplete payloads. Do not guess missing required fields.
       - Log and return structured error objects for any failure (validation, tool failure, subagent error).
-
-      Expected input:
+      Given a full poluted payload, extract the information bellow.
+      Expected extracted input:
         "content_theme": "<string>",
         "content_goal": "<string>",
         "target_audience": "<string>"
         "user_name": "<string>",
         "user_email": "<string>",
+        "content_notes": "<string>",
         "platforms": "optional<list>" - Default as article (web)
 
       Then, use the response_formatter_agent to format the output and use the final output as you final response. No aditional text needed.
