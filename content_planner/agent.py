@@ -35,7 +35,7 @@ root_agent = Agent(
       - Reject incomplete payloads. Do not guess missing required fields.
       - Log and return structured error objects for any failure (validation, tool failure, subagent error).
       Given a full entry payload, extract the information bellow 1 time using the tool extract_content_request. Send the response to the content_planner_agent tool .
-      Then, use the response_formatter_agent to format the output from the content_planner_agent and use the final output formated as Markdown text as you final response. No aditional text needed.
+      Then, use the response_formatter_agent to format the output from the content_planner_agent and use the final output as you final response. No aditional text needed.
     """,
     sub_agents=[
         response_formatter_agent
