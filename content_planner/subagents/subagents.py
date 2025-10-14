@@ -3,7 +3,8 @@ from typing import List
 from google.adk.agents import Agent
 from google.adk.tools import google_search
 from ..config import (
-    text_model_lite
+    text_model_lite,
+    text_model
 )
 from pydantic import BaseModel, Field
 
@@ -117,7 +118,7 @@ guideline = """
 """
 content_planner_agent = Agent(
     name="content_planner",
-    model=text_model_lite,
+    model=text_model,
     description="You are responsible for planning the content structure for your client.",
     instruction=f"""
         Goal: >
@@ -155,6 +156,7 @@ content_planner_agent = Agent(
                         - "Tips to automate daily operations"
                     formats: ["Blog posts", "Short videos", "Email tips"]
                     channels: ["LinkedIn", "YouTube", "Newsletter", "Blog"]
+                    guideline: {guideline}
         """,
     tools=[google_search],
     output_key="content_plan"
