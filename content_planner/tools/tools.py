@@ -188,8 +188,8 @@ def _get_custom_field(fields: List[Dict[str, Any]], name: str) -> Optional[Dict[
     """Return the custom field dict by its 'name' or None."""
     for f in fields:
         if f.get("name") == name:
-            return f.get("value", "")
-    return ""
+            return f
+    return None
 
 def _extract_platform_labels(platform_field: dict) -> list[str]:
     default_platforms = ["article (web)"]
@@ -230,9 +230,9 @@ def extract_content_request(payload: Dict[str, Any]) -> Dict[str, Any]:
     notes_field = _get_custom_field(custom_fields, "Content Notes")
     platforms_field = _get_custom_field(custom_fields, "Platforms")
 
-    content_goal = goal_field
-    target_audience = audience_field
-    content_notes = notes_field
+    content_goal = (goal_field.get("value") if goal_field else "") or ""
+    target_audience = (audience_field.get("value") if audience_field else "") or ""
+    content_notes = (notes_field.get("value") if notes_field else "") or ""
 
     platforms = _extract_platform_labels(platforms_field)
 

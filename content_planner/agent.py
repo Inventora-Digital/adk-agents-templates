@@ -7,6 +7,9 @@ from .subagents.subagents import (
   content_planner_agent,
   response_formatter_agent
 )
+from .tools.tools import (
+    extract_content_request
+)
 
 now = datetime.datetime.now()
 
@@ -29,7 +32,7 @@ root_agent = Agent(
         for identical inputs.
       - Reject incomplete payloads. Do not guess missing required fields.
       - Log and return structured error objects for any failure (validation, tool failure, subagent error).
-      Given a full poluted payload, extract the information bellow.
+      Given a full poluted payload, extract the information bellow using the tool extract_content_request.
       Expected extracted input:
         "content_theme": "<string>",
         "content_goal": "<string>",
@@ -38,11 +41,12 @@ root_agent = Agent(
         "user_email": "<string>",
         "content_notes": "<string>",
         "platforms": "optional<list>" - Default as article (web)
-
-      Then, use the response_formatter_agent to format the output and use the final output as you final response. No aditional text needed.
+      send the payload to the content_planner_agent.
+      Then, use the response_formatter_agent to format the output from the content_planner_agent and use the final output as you final response. No aditional text needed.
     """,
     sub_agents=[
         content_planner_agent,
         response_formatter_agent
     ],
+    tools=[extract_content_request]
 )
