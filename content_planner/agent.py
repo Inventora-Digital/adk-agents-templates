@@ -12,7 +12,8 @@ from .subagents.subagents import (
 from .tools.tools import (
     extract_content_request
 )
-
+text_model_lite="gemini-2.5-flash-lite"
+text_model = "gemini-2.5-flash"
 now = datetime.datetime.now()
 
 
