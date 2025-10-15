@@ -2,6 +2,10 @@ import datetime
 from typing import List
 from google.adk.agents import Agent
 from google.adk.tools import google_search
+from ..config import (
+    text_model_lite,
+    text_model
+)
 from pydantic import BaseModel, Field
 
 class ContentPlan(BaseModel):
@@ -84,7 +88,7 @@ guideline = """
 """
 content_planner_agent = Agent(
     name="content_planner",
-    model="gemini-2.5-flash",
+    model=text_model,
     description="You are responsible for planning the content structure for your client.",
     instruction=f"""
         Goal: >
@@ -120,8 +124,8 @@ content_planner_agent = Agent(
                         - "AI tools that boost productivity"
                         - "Real client stories"
                         - "Tips to automate daily operations"
-                    formats: ["article", "newsletter", "post"]
-                    channels: ["web", "linkedin", "twitter", "reddit"]
+                    formats: ["Blog posts", "Short videos", "Email tips"]
+                    channels: ["LinkedIn", "YouTube", "Newsletter", "Blog"]
                     guideline: {guideline}
         """,
     tools=[google_search],
@@ -130,7 +134,7 @@ content_planner_agent = Agent(
 
 response_formatter_agent = Agent(
     name="response_formatter",
-    model="gemini-2.5-flash-lite",
+    model=text_model_lite,
     description="You are responsible for formating the response from content_planner",
     instruction="Format the response content_plan using the ContentPlan schema",
     output_schema=ContentPlan,

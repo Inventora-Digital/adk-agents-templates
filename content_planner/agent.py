@@ -2,6 +2,9 @@ import datetime
 from google.adk.agents import Agent
 from google.adk.tools.agent_tool import AgentTool
 from google.adk.tools import FunctionTool
+from .config import (
+  text_model
+)
 from .subagents.subagents import (
   content_planner_agent,
   response_formatter_agent
